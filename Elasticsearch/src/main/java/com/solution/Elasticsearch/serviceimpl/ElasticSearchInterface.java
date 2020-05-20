@@ -11,5 +11,5 @@ public interface ElasticSearchInterface {
 	
 	public List<Movie> searchAllMovie() throws Exception;
 
-
+	public List<Movie> searchByQuery(String query) throws Exception;
 }

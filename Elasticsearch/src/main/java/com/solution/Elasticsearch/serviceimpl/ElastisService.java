@@ -13,8 +13,10 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.lucene.search.function.FunctionScoreQuery.ScoreMode;
+import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
@@ -72,6 +74,21 @@ public class ElastisService implements ElasticSearchInterface {
         		 hit -> results.add(new JsonUtil().convertJsontoJava(hit.getSourceAsString(), Movie.class)));
         System.out.println(results);
         return results;
+	}
+
+
+ 
+	@Override
+	public List<Movie> searchByQuery(String query) throws Exception {
+		SearchRequest searchRequest=new SearchRequest();
+		SearchSourceBuilder searchSourceBuilder=new SearchSourceBuilder();
+		MatchQueryBuilder matchQueryBuilder=new MatchQueryBuilder("movietitle",query);
+		matchQueryBuilder.fuzziness(Fuzziness.AUTO);
+		matchQueryBuilder.prefixLength(3);
+		matchQueryBuilder.maxExpansions(10);
+		searchSourceBuilder.query(matchQueryBuilder);
+		SearchResponse response=client.search(searchRequest, RequestOptions.DEFAULT);
+		return getSearchResult(response);
 	}
 	
 
